@@ -1,0 +1,114 @@
+//1. Define the Payment Card Class
+Replace the TCard class with a TPaymentCard class that represents a payment card. This class will include properties like CardNumber, CardHolderName, ExpiryDate, and CVV.
+
+type
+  TPaymentCard = class
+  private
+    FCardNumber: string;
+    FCardHolderName: string;
+    FExpiryDate: TDate;
+    FCVV: string;
+  public
+    constructor Create(ACardNumber, ACardHolderName: string; AExpiryDate: TDate; ACVV: string);
+    property CardNumber: string read FCardNumber;
+    property CardHolderName: string read FCardHolderName;
+    property ExpiryDate: TDate read FExpiryDate;
+    property CVV: string read FCVV;
+  end;
+
+constructor TPaymentCard.Create(ACardNumber, ACardHolderName: string; AExpiryDate: TDate; ACVV: string);
+begin
+  FCardNumber := ACardNumber;
+  FCardHolderName := ACardHolderName;
+  FExpiryDate := AExpiryDate;
+  FCVV := ACVV;
+end;
+
+//2. Define the Account Class
+Create a TAccount class to manage user accounts. This class will include properties like AccountNumber, Balance, and a list of TPaymentCard objects.
+
+type
+  TAccount = class
+  private
+    FAccountNumber: string;
+    FBalance: Currency;
+    FCards: TList<TPaymentCard>;
+  public
+    constructor Create(AAccountNumber: string; ABalance: Currency);
+    destructor Destroy; override;
+    procedure AddCard(ACard: TPaymentCard);
+    function GetCard(Index: Integer): TPaymentCard;
+    property AccountNumber: string read FAccountNumber;
+    property Balance: Currency read FBalance write FBalance;
+    property Cards: TList<TPaymentCard> read FCards;
+  end;
+
+constructor TAccount.Create(AAccountNumber: string; ABalance: Currency);
+begin
+  FAccountNumber := AAccountNumber;
+  FBalance := ABalance;
+  FCards := TList<TPaymentCard>.Create;
+end;
+
+destructor TAccount.Destroy;
+var
+  Card: TPaymentCard;
+begin
+  for Card in FCards do
+    Card.Free;
+  FCards.Free;
+  inherited;
+end;
+
+procedure TAccount.AddCard(ACard: TPaymentCard);
+begin
+  FCards.Add(ACard);
+end;
+
+function TAccount.GetCard(Index: Integer): TPaymentCard;
+begin
+  if (Index >= 0) and (Index < FCards.Count) then
+    Result := FCards[Index]
+  else
+    Result := nil;
+end;
+
+//3. Define the Transaction Class
+Create a TTransaction class to manage payment transactions. This class will include properties like TransactionID, Amount, CardUsed, and TransactionDate.
+
+type
+  TTransaction = class
+  private
+    FTransactionID: string;
+    FAmount: Currency;
+    FCardUsed: TPaymentCard;
+    FTransactionDate: TDateTime;
+  public
+    constructor Create(ATransactionID: string; AAmount: Currency; ACardUsed: TPaymentCard; ATransactionDate: TDateTime);
+    property TransactionID: string read FTransactionID;
+    property Amount: Currency read FAmount;
+    property CardUsed: TPaymentCard read FCardUsed;
+    property TransactionDate: TDateTime read FTransactionDate;
+  end;
+
+constructor TTransaction.Create(ATransactionID: string; AAmount: Currency; ACardUsed: TPaymentCard; ATransactionDate: TDateTime);
+begin
+  FTransactionID := ATransactionID;
+  FAmount := AAmount;
+  FCardUsed := ACardUsed;
+  FTransactionDate := ATransactionDate;
+end;
+
+//4. Using the Payment System
+Now you can use these classes to simulate a payment system. For example, you can create an account, add a payment card, and perform a transaction.
+
+procedure TestPaymentSystem;
+var
+  Account: TAccount;
+  Card: TPaymentCard;
+  Transaction: TTransaction;
+begin
+  Account := TAccount.Create('123456789', 1000.00);
+  try
+    Card := TPaymentCard.Create('4111111111111111', 'John Doe', EncodeDate(2025, 12, 31), '123');
+    Account.AddCard
